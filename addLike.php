@@ -8,7 +8,7 @@ register_shutdown_function(function(){
     }
 });
 
-$movie_id = $_REQUEST["movie_id"]; // Assuming the parameter is movie_id
+$movie_id = $_REQUEST["movie_id"];
 $user_id = $_SESSION["id"];
 
 $sql = "SELECT * FROM users_likes WHERE movie_id = $movie_id AND user_id = $user_id";

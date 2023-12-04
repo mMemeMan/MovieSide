@@ -17,67 +17,121 @@ require("config.php");
             margin: 0 auto;
         }
 
-        .poster {
-            width: 320px;
-            height: 410px;
-            margin-bottom: 20px;
-            transition: transform 0.3s ease-in-out;
-        }
-
-        .poster:hover {
-            transform: scale(1.05); /* Increase size on hover */
-        }
-
-        .movie-column {
-            width: 25%;
-            padding: 0 15px;
-        }
-
-        .movie-title {
-            margin-top: 5px;
-            font-size: 16px;
-            font-weight: bold;
-            color: black; /* Set text color to black */
-            transition: color 0.3s ease-in-out;
-        }
-
-        .movie-column:hover .movie-title {
-            color: black; /* Change text color on hover */
-        }
+       .footer {
+           position: fixed;
+           bottom: 10px;
+           right: 10px;
+           color: black;
+           font-size: 14px;
+       }
     </style>
 </head>
 
 <body>
     <div class="wrapper">
         <div class="container-fluid">
-            <div class="row">
-                <?php
-                require_once "config.php";
-                $data = "SELECT * FROM movies";
-                if ($rows = mysqli_query($conn, $data)) {
-                    if (mysqli_num_rows($rows) > 0) {
-                        while ($row = mysqli_fetch_array($rows)) {
-                            ?>
-                            <div class="col-md-3 text-center movie-column">
-                                <a href="details.php?id=<?php echo $row['id']; ?>">
-                                    <img src="<?php echo $row['img']; ?>" alt="<?php echo $row['name']; ?>" class="img-responsive poster">
-                                    <p class="movie-title"><?php echo $row['name']; ?></p>
-                                </a>
-                            </div>
-                            <?php
-                        }
-                        mysqli_free_result($rows);
-                    } else {
-                        echo "<p class='lead'><em>No records found.</em></p>";
-                    }
-                } else {
-                    echo "ERROR: Could not able to execute $sql. " . mysqli_error($conn);
-                }
-                mysqli_close($conn);
-                ?>
+        <div class="filter-container">
+                            <label for="categoryFilter">Filter by Category:</label>
+                            <select id="categoryFilter">
+                                <option value="">All</option>
+                                <?php
+                                    $categories_query = "SELECT * FROM categories";
+                                    $categories_result = mysqli_query($conn, $categories_query);
+
+                                    if ($categories_result && mysqli_num_rows($categories_result) > 0) {
+                                        while ($category = mysqli_fetch_assoc($categories_result)) {
+                                            echo "<option value='{$category['id']}'>{$category['name']}</option>";
+                                        }
+                                    }
+                                ?>
+                            </select>
+                             <select id="sortRating">
+                                                <option value="">All</option>
+                                                 <option value="asc">Low rated first</option>
+                                                 <option value="desc">Highly rated first</option>
+                             </select>
+                        </div>
+            <div class="movies-container">
+
             </div>
         </div>
     </div>
-</body>
+    <br>
+    <br>
 
+    <script>
+        $(document).ready(function () {
+            var page = 1;
+            var isLoading = false;
+            var selectedCategory = '';
+            var sortDirection = '';
+
+            function loadMovies(category = '') {
+                        $.ajax({
+                            url: 'getMovies.php?page=' + page + '&category=' + category + '&sort=' + sortDirection,
+                            type: 'get',
+                            success: function (response) {
+                                $('.movies-container').append(response);
+                                page++;
+                                isLoading = false;
+                            }
+                        });
+                    }
+
+            loadMovies();
+
+            $('#categoryFilter').change(function () {
+                var category = $(this).val();
+                $('.movies-container').empty();
+                page = 1;
+                selectedCategory = category;
+
+                if ($('.filter-container').find('#categoryFilter').length === 0) {
+                    $('.filter-container').html(`
+                        <label for="categoryFilter">Filter by Category:</label>
+                        <select id="categoryFilter">
+                            <option value="">All</option>
+                            <?php
+                                // Здесь нужно добавить PHP-код для получения списка категорий из базы данных
+                                $categories_query = "SELECT * FROM categories";
+                                $categories_result = mysqli_query($conn, $categories_query);
+
+                                if ($categories_result && mysqli_num_rows($categories_result) > 0) {
+                                    while ($category = mysqli_fetch_assoc($categories_result)) {
+                                        echo "<option value='{$category['id']}'>{$category['name']}</option>";
+                                    }
+                                }
+                            ?>
+                        </select>
+                    `);
+                }
+
+                loadMovies(selectedCategory);
+            });
+
+            $(window).scroll(function () {
+                if ($(window).scrollTop() + $(window).height() >= $(document).height() - 100 && !isLoading) {
+                    isLoading = true;
+
+                    if (selectedCategory !== '') {
+                        loadMovies(selectedCategory);
+                    } else {
+                        loadMovies();
+                    }
+                }
+            });
+
+            $('#sortRating').change(function () {
+                        sortDirection = $(this).val();
+                        $('.movies-container').empty();
+                        page = 1;
+                        loadMovies(selectedCategory);
+            });
+
+        });
+    </script>
+</body>
 </html>
+
+
+

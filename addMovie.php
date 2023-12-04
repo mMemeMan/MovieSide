@@ -9,11 +9,10 @@ register_shutdown_function(function(){
 
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $name = $_POST["name"];
-    $category_id = $_POST["category_id"];
-    $description = $_POST["description"];
+    $description = mysqli_real_escape_string($conn, $_POST['description']);
     $year = $_POST["year"];
     $country = $_POST["country"];
-
+    $categories = $_POST["categories"];
 
     if (isset($_FILES['img'])) {
         $file = $_FILES['img'];
@@ -22,16 +21,21 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         $fileDestination = 'uploads/' . $fileName;
         move_uploaded_file($fileTmpName, $fileDestination);
 
-        $query = "INSERT INTO movies (name, category_id, description, img, year, country) VALUES ('$name', '$category_id', '$description', '$fileDestination', '$year', '$country')";
+        $insertMovieQuery = "INSERT INTO movies (name, description, img, year, country) VALUES ('$name', '$description', '$fileDestination', '$year', '$country')";
 
+        if (mysqli_query($conn, $insertMovieQuery)) {
+            $movieId = mysqli_insert_id($conn);
 
-        if (mysqli_query($conn, $query)) {
+            foreach ($categories as $categoryId) {
+                $insertCategoryQuery = "INSERT INTO movie_categories (movies_id, categories_id) VALUES ('$movieId', '$categoryId')";
+                mysqli_query($conn, $insertCategoryQuery);
+            }
+
             header("Location: index.php");
             exit();
         } else {
             echo "Error: " . mysqli_error($conn);
         }
     }
-
 }
 ?>

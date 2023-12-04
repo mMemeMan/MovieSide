@@ -27,7 +27,7 @@ $comments_result = mysqli_query($conn, $comments_query);
                     ?>
                      <a href="details.php?id=<?php echo $comment['movie_id']; ?>" class="list-group-item">
                         <p><strong>Nickname:</strong> <?php echo $comment['nick']; ?></p>
-                        <p><strong>Rating:</strong> <?php echo $comment['rating']; ?>/5</p>
+                        <p><strong>Rating:</strong> <?php echo $comment['rating']; ?>/10</p>
                         <p><strong>Comment:</strong> <?php echo $comment['info']; ?></p>
                         <p><em>Date:</em> <?php echo $comment['date']; ?></p>
                     </a>

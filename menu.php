@@ -17,11 +17,17 @@ require("config.php");
     <body>
  <div class="wrapper">
          <div class="page-header clearfix">
-              <h2 class="pull-left" style="margin-bottom: 10px;">Hello, <?php echo $_SESSION['login']; ?></h2>
+              <h2 class="pull-left">
+                              <span class="text-uppercase" style="font-size: 35px;">MOVIESIDE</span> welcomes <span style="text-decoration: underline;"><?php echo $_SESSION['login']; ?></span>
+                          </h2>
               <a href="logout.php" class="btn btn-danger pull-right">Logout</a>
               <a href="searchMyComments.php" class="btn btn-info pull-right" style="margin-right: 10px;">My comments</a>
               <a href="searchMyLikes.php" class="btn btn-info pull-right" style="margin-right: 10px;">My Likes</a>
-              <a href="addMovieForm.php" class="btn btn-info pull-right" style="margin-right: 10px;">Add movie</a>
+               <?php
+                    if (isset($_SESSION['id']) && isset($_SESSION['role']) && $_SESSION['role'] == 'admin') {
+                        echo '<a href="addMovieForm.php" class="btn btn-info pull-right" style="margin-right: 10px;">Add movie</a>';
+                    }
+               ?>
               <form class="form-inline pull-right" action="searchByName.php" method="post">
                    <div class="form-group">
                        <input type="text" class="form-control" placeholder="Search movie" name="search">

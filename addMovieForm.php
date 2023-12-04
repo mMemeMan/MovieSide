@@ -23,8 +23,9 @@
                             <input type="text" name="name" class="form-control" required>
                         </div>
                         <div class="form-group">
-                            <label>Category ID</label>
-                            <input type="number" name="category_id" class="form-control" required>
+                            <label>Categories</label>
+                                <?php include 'fetchCategories.php'; ?>
+                            </select>
                         </div>
                         <div class="form-group">
                             <label>Description</label>
